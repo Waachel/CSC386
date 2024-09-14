@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Box2DX.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,24 +8,38 @@ using System.Threading.Tasks;
 
 namespace OmegaRace.Data_Queues
 {
+
+
     [Serializable]
-    public class PlayerMovementMessage : DataMessage
+
+    public class UpdatePlayerMovementMessage : DataMessage
     {
-        public int horzInput;
-        public int vertInput;
+        public Vec2 pos;
+        public float angle;
         public int playerNum;
+
+        public void Set(GameObject gObj)
+        {
+            //id = gObj.getID();
+            pos = gObj.GetPixelPosition();
+            angle = gObj.GetAngle_Deg();
+            //velocity = gObj.GetWorldVelocity();
+        }
+
         public override void Serialize(ref BinaryWriter writer)
         {
             writer.Write(playerNum);
-            writer.Write(horzInput);
-            writer.Write(vertInput);
+            writer.Write(pos.X);
+            writer.Write(pos.Y);
+            writer.Write(angle);
         }
 
         public override void Deserialize(ref BinaryReader reader)
         {
             playerNum = reader.ReadInt32();
-            horzInput = reader.ReadInt32();
-            vertInput = reader.ReadInt32();
+            pos.X = reader.ReadSingle();
+            pos.Y = reader.ReadSingle();
+            angle = reader.ReadSingle();
         }
 
         public override void Execute()
@@ -34,15 +49,12 @@ namespace OmegaRace.Data_Queues
 
             if (playerNum == 1)
             {
-                plMgr.P1Data.ship.Move(vertInput);
-                plMgr.P1Data.ship.Rotate(horzInput);
-            }
+                plMgr.P1Data.ship.SetPosAndAngle(pos.X, pos.Y, angle);
+        }
 
             else if (playerNum == 2)
             {
-                plMgr.P2Data.ship.Move(vertInput);
-                plMgr.P2Data.ship.Rotate(horzInput);
-
+                plMgr.P2Data.ship.SetPosAndAngle(pos.X, pos.Y, angle);
             }
 
             else
@@ -50,12 +62,12 @@ namespace OmegaRace.Data_Queues
                 //do nothing
             }
         }
-
         public override void Reset()
         {
-            playerNum = 0; 
-            horzInput = 0; 
-            vertInput = 0;
+            pos = default(Vec2);
+            angle = 0.0f;
+            playerNum = 0;
         }
+
     }
 }

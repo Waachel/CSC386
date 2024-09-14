@@ -23,6 +23,8 @@ namespace OmegaRace
         PlayerData owner;
         PlayerManager PlMgr;
 
+        int missileCount = 3;
+
         public Ship(PlayerData own, PlayerManager pMgr, Azul.Rect screenRect, Azul.Color color)
             : base (GAMEOBJECT_TYPE.SHIP, new Azul.Rect(0, 0, 32, 32), screenRect, TextureCollection.shipTexture, color)
         {
@@ -112,6 +114,10 @@ namespace OmegaRace
             return pBody.GetBody().GetWorldVector(localFwd);
         }
 
+        public int getMissileCount()
+        {
+            return missileCount;
+        }
         public void OnHit()
         {
             PlMgr.PlayerKilled(this.owner);

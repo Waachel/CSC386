@@ -25,7 +25,7 @@ namespace OmegaRace
             int width = (int)(aspectRatio * rc.Height / 2);
 
             //left/right
-            int pos = 0;  // left = 0, right = (int)rc.Width / 2
+            int pos = (int)rc.Width + 400;  // left = 0, right = (int)rc.Width / 2
 
             IntPtr hwndFound = GetConsoleWindow(); // Console window adjustment
             MoveWindow(hwndFound, pos, (int)rc.Height / 2, width, height, true);

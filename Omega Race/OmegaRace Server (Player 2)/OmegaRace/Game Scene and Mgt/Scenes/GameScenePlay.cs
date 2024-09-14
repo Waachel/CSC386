@@ -10,6 +10,8 @@ using System.IO;
 using static OmegaRace.MessageQueueManager;
 using System.Windows.Interop;
 using AzulNetworkBase;
+using Box2DX.Common;
+using OmegaRace.Managers.MessageManager;
 
 namespace OmegaRace
 {
@@ -20,7 +22,9 @@ namespace OmegaRace
 
         DisplayManager DisplayMgr;
 
-        NetworkManager NetworkMgr;
+        public NetworkManager NetworkMgr;
+
+        public MessageManager MsgMgr;
 
         public GameScenePlay()
         {
@@ -28,6 +32,8 @@ namespace OmegaRace
             MsgQueueMgr = new MessageQueueManager();
             DisplayMgr = new DisplayManager();
             NetworkMgr = new NetworkManager(14240);
+            MsgMgr = new MessageManager(10);
+
         }
 
         void IGameScene.Enter()
@@ -56,11 +62,24 @@ namespace OmegaRace
             MsgQueueMgr.AddToOutputQueue(queueMsg);
         }
 
-        public void MessageToClient(Message m)
+        public void MessageToServer(Message m)
         {
             QueueMessage queueMsg = new QueueMessage();
             queueMsg.msg = m;
             MsgQueueMgr.AddToOutputQueue(queueMsg);
+
+            //MemoryStream stream = new MemoryStream();
+            //BinaryWriter writer = new BinaryWriter(stream);
+            //m.Serialize(ref writer);
+
+            //NetworkMgr.SendMessage(stream.ToArray());
+        }
+
+        public void MessageToClient(Message m)
+        {
+            QueueMessage queueMsg = new QueueMessage();
+            queueMsg.msg = m;
+            //MsgQueueMgr.AddToOutputQueue(queueMsg);
 
             MemoryStream stream = new MemoryStream();
             BinaryWriter writer = new BinaryWriter(stream);
@@ -87,30 +106,176 @@ namespace OmegaRace
             //PlayerMgr.P2Data.ship.Move(p2_V);
             //*/
             //Data driven example for P2 movement
-            PlayerMovementMessage msg2 = new PlayerMovementMessage();
+            PlayerMovementMessage msg2 = MsgMgr.GetPlayerMovementMessage();
             msg2.playerNum = 2;
             msg2.horzInput = p2_H;
             msg2.vertInput = p2_V;
             Message sendMsg = new Message();
-            sendMsg.populateMessage(msg2);
-            MessageToClient(sendMsg);
+            sendMsg.PopulateMessage(msg2);
+            MessageToServer(sendMsg);
 
-            FireMessage msg2F = new FireMessage();
-            msg2F.playerNum = 2;
-            msg2F.fire = InputManager.GetButtonDown(INPUTBUTTON.P2_FIRE);
-            Message sendMsgF = new Message();
-            sendMsgF.populateMessage(msg2F);
-            MessageToClient(sendMsgF);
+            MsgMgr.ReleasePlayerMovementMessage(msg2);
 
-            MineMessage msg2M = new MineMessage();
-            msg2M.playerNum = 2;
-            msg2M.dropMine = InputManager.GetButtonDown(INPUTBUTTON.P2_LAYMINE);
-            Message sendMsgM = new Message();
-            sendMsgM.populateMessage(msg2M);
-            MessageToClient(sendMsgM);
+            //limit of 3 missiles
+            if (InputManager.GetButtonDown(INPUTBUTTON.P2_FIRE) && (PlayerMgr.P2Data.missileCount > 0))
+            {
+                MissileEvent msg2F = MsgMgr.GetMissileEvent();
+                msg2F.playerNum = 2;
+                Message sendMsgF = new Message();
+                sendMsgF.PopulateMessage(msg2F);
+                MessageToServer(sendMsgF);
+                MsgMgr.ReleaseMissileEvent(msg2F);
+            }
 
+            //list of active missiles
+            if (ActiveMissileList.missileFired)
+            {
+                foreach (GameObject obj in GameManager.getInstance().getObjList())
+                {
+                    if (obj.type == GAMEOBJECT_TYPE.MISSILE && !ActiveMissileList.activeMissiles.Contains((Missile)obj))
+                    {
+                        // add missile to active missile list.
+                        ActiveMissileList.activeMissiles.Add((Missile)obj);
+                    }
+                }
+
+                // set to false.
+                ActiveMissileList.missileFired = false;
+            }
+
+            //limit of 5 mines
+            if (InputManager.GetButtonDown(INPUTBUTTON.P2_LAYMINE) && (PlayerMgr.P2Data.mineCount > 0))
+            {
+                MineEvent msg2M = MsgMgr.GetMineEvent();
+                msg2M.playerNum = 2;
+                Message sendMsgM = new Message();
+                sendMsgM.PopulateMessage(msg2M);
+                MessageToServer(sendMsgM);
+                MsgMgr.ReleaseMineEvent(msg2M);
+            }
+
+            //list of active mines
+            if (ActiveMineList.mineDropped)
+            {
+                foreach (GameObject obj in GameManager.getInstance().getObjList())
+                {
+                    if (obj.type == GAMEOBJECT_TYPE.MINE && !ActiveMineList.activeMines.Contains((Mine)obj))
+                    {
+                        // add missile to active missile list.
+                        ActiveMineList.activeMines.Add((Mine)obj);
+                    }
+                }
+
+                // set to false.
+                ActiveMineList.mineDropped = false;
+            }
+
+            //Send ship information to client
+            if ((PlayerMgr.P1Data.ship.GetPixelVelocity() != Vec2.Zero) || (PlayerMgr.P2Data.ship.GetPixelVelocity() != Vec2.Zero))
+            {
+                //player1
+                UpdatePlayerMovementMessage move1 = MsgMgr.GetUpdatePlayerMovementMessage();
+                move1.Set(PlayerMgr.P1Data.ship);
+                move1.playerNum = 1;
+                Message moveMsg1 = new Message();
+                moveMsg1.PopulateMessage(move1);
+                MessageToClient(moveMsg1);
+
+                MsgMgr.ReleaseUpdatePlayerMovementMessage(move1);
+
+                UpdatePlayerMovementMessage move2 = MsgMgr.GetUpdatePlayerMovementMessage();
+                move2.Set(PlayerMgr.P2Data.ship);
+                move2.playerNum = 2;
+                Message moveMsg2 = new Message();
+                moveMsg2.PopulateMessage(move2);
+                MessageToClient(moveMsg2);
+
+                MsgMgr.ReleaseUpdatePlayerMovementMessage(move2);
+            }
+
+            if (ActiveMissileList.missileFired)
+            {
+                // search the game object list to find new missiles
+                foreach (GameObject obj in GameManager.getInstance().getObjList())
+                {
+                    // if object is a missile object and if missile list doesn't already contains the object.
+                    if (obj.type == GAMEOBJECT_TYPE.MISSILE && !ActiveMissileList.activeMissiles.Contains((Missile)obj))
+                    {
+                        //  add missile to active missile list.
+                        ActiveMissileList.activeMissiles.Add((Missile)obj);
+                    }
+                }
+
+                // set to false.
+                ActiveMissileList.missileFired = false;
+            }
+
+            //Send missile information to client
+            if (ActiveMissileList.activeMissiles.Count > 0)
+            {
+                // iterate all active missiles.
+                UpdateMissileMessage fire1 = MsgMgr.GetUpdateMissileMessage();
+                foreach (Missile activeMissile in ActiveMissileList.activeMissiles)
+                {
+                    // add the data for each active missile.
+                    fire1.Set(activeMissile);
+                }
+
+                Message fireMsg = new Message();
+                fireMsg.PopulateMessage(fire1);
+                MessageToClient(fireMsg);
+
+                MsgMgr.ReleaseUpdateMissileMessage(fire1);
+            }
             
-            
+            //list of active mines
+            if (ActiveMineList.mineDropped)
+            {
+                foreach (GameObject obj in GameManager.getInstance().getObjList())
+                {
+                    if (obj.type == GAMEOBJECT_TYPE.MINE && !ActiveMineList.activeMines.Contains((Mine)obj))
+                    {
+                        // add missile to active missile list.
+                        ActiveMineList.activeMines.Add((Mine)obj);
+                    }
+                }
+
+                // set to false.
+                ActiveMineList.mineDropped = false;
+            }
+
+            //Send mine information to client
+            if (ActiveMineList.activeMines.Count > 0)
+            {
+                // iterate all active mines.
+                UpdateMineMessage drop1 = MsgMgr.GetUpdateMineMessage();
+                foreach (Mine activeMine in ActiveMineList.activeMines)
+                {
+                    // add the data for each active missile.
+                    drop1.Set(activeMine);
+                }
+
+                Message dropMsg = new Message();
+                dropMsg.PopulateMessage(drop1);
+                MessageToClient(dropMsg);
+                MsgMgr.ReleaseUpdateMineMessage(drop1);
+            }
+
+            //Send collisions information to client
+
+            // send collision list only if there was a new collision event
+            if (CollisionEvent.collisions.Count > 0)
+            {
+                // send collision list
+                CollisionsList msgList = new CollisionsList(CollisionEvent.collisions);
+                Message colMsg = new Message();
+                colMsg.PopulateMessage(msgList);
+                MessageToServer(colMsg);
+                MessageToClient(colMsg);
+
+                // clear list for next set of collisions.
+                CollisionEvent.collisions.Clear();
+            }
 
             /* Screen log example
             ScreenLog.Add(string.Format("Frame Time: {0:0.0}", 1 / TimeManager.GetFrameTime()));

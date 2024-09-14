@@ -10,6 +10,7 @@ using OmegaRace.Managers.NetworkManager;
 using System.IO;
 using static OmegaRace.MessageQueueManager;
 using System.Windows.Interop;
+using OmegaRace.Managers.MessageManager;
 
 namespace OmegaRace
 {
@@ -20,7 +21,9 @@ namespace OmegaRace
 
         DisplayManager DisplayMgr;
 
-        NetworkManager NetworkMgr;
+        public NetworkManager NetworkMgr;
+
+        public MessageManager MsgMgr;
 
         public GameScenePlay()
         {
@@ -28,6 +31,8 @@ namespace OmegaRace
             MsgQueueMgr = new MessageQueueManager();
             DisplayMgr = new DisplayManager();
             NetworkMgr = new NetworkManager("localhost", 14240);
+            MsgMgr = new MessageManager(10);
+
         }
 
         void IGameScene.Enter()
@@ -60,7 +65,7 @@ namespace OmegaRace
         {
             QueueMessage queueMsg = new QueueMessage();
             queueMsg.msg = m;
-            MsgQueueMgr.AddToOutputQueue(queueMsg);
+           // MsgQueueMgr.AddToOutputQueue(queueMsg);
 
             MemoryStream stream = new MemoryStream();
             BinaryWriter writer = new BinaryWriter(stream);
@@ -68,10 +73,17 @@ namespace OmegaRace
 
             NetworkMgr.SendMessage(stream.ToArray());
         }
+
+        public void MessageToClient(Message m)
+        {
+            QueueMessage queueMsg = new QueueMessage();
+            queueMsg.msg = m;
+            MsgQueueMgr.AddToInputQueue(queueMsg);
+        }
         void IGameScene.Update()
         { 
             // First, update the physics engine
-            PhysicWorld.Update();
+           // PhysicWorld.Update();
 
             //Queue processing goes here
             MsgQueueMgr.Process();
@@ -86,33 +98,54 @@ namespace OmegaRace
             //PlayerMgr.P1Data.ship.Move(p1_V);
             
 
-            PlayerMovementMessage msg1 = new PlayerMovementMessage();
+            PlayerMovementMessage msg1 = MsgMgr.GetPlayerMovementMessage();
             msg1.playerNum = 1;
             msg1.horzInput = p1_H;
             msg1.vertInput = p1_V;
 
             Message sendMsg = new Message();
-            sendMsg.populateMessage(msg1);
+            sendMsg.PopulateMessage(msg1);
             MessageToServer(sendMsg);
 
-            FireMessage msg1F = new FireMessage();
-            msg1F.playerNum = 1;
-            msg1F.fire = InputManager.GetButtonDown(INPUTBUTTON.P1_FIRE);
-            Message sendMsgF = new Message();
-            sendMsgF.populateMessage(msg1F);
-            MessageToServer(sendMsgF);
+            MsgMgr.ReleasePlayerMovementMessage(msg1);
 
-            MineMessage msg1M = new MineMessage();
-            msg1M.playerNum = 1;
-            msg1M.dropMine = InputManager.GetButtonDown(INPUTBUTTON.P1_LAYMINE);
-            Message sendMsgM = new Message();
-            sendMsgM.populateMessage(msg1M);
-            MessageToServer(sendMsgM);
+            //limit of 3 missiles
+            if (InputManager.GetButtonDown(INPUTBUTTON.P1_FIRE) && (PlayerMgr.P1Data.missileCount > 0))
+            {
+                MissileEvent msg2F = MsgMgr.GetMissileEvent();
+                msg2F.playerNum = 1;
+                Message sendMsgF = new Message();
+                sendMsgF.PopulateMessage(msg2F);
+                MessageToServer(sendMsgF);
+                MsgMgr.ReleaseMissileEvent(msg2F);
+            }
 
+            //limit of 5 mines
+            if (InputManager.GetButtonDown(INPUTBUTTON.P1_LAYMINE) && (PlayerMgr.P1Data.mineCount > 0))
+            {
+                MineEvent msg1M = MsgMgr.GetMineEvent();
+                msg1M.playerNum = 1;          
+                Message sendMsgM = new Message();
+                sendMsgM.PopulateMessage(msg1M);
+                MessageToServer(sendMsgM);
+                MsgMgr.ReleaseMineEvent(msg1M);
+            }
 
+            //list of active missiles
+            if (ActiveMissileList.missileFired)
+            {
+                foreach (GameObject obj in GameManager.getInstance().getObjList())
+                {
+                    if (obj.type == GAMEOBJECT_TYPE.MISSILE && !ActiveMissileList.activeMissiles.Contains((Missile)obj))
+                    {
+                        // add missile to active missile list.
+                        ActiveMissileList.activeMissiles.Add((Missile)obj);
+                    }
+                }
 
-
-
+                // set to false.
+                ActiveMissileList.missileFired = false;
+            }
         }
         void IGameScene.Draw()
         {
@@ -180,5 +213,7 @@ namespace OmegaRace
             GameManager.AddGameObject(new FencePost(new Azul.Rect(400, 330, 10, 10)));
             GameManager.AddGameObject(new FencePost(new Azul.Rect(600, 330, 10, 10)));
         }
+
+
     }
 }

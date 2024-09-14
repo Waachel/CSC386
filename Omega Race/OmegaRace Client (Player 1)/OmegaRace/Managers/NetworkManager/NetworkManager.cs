@@ -11,7 +11,7 @@ using OmegaRace.Data_Queues;
 
 namespace OmegaRace.Managers.NetworkManager
 {
-    class NetworkManager
+    public class NetworkManager
     {
         NetClient client;
         public NetworkManager(string ipOrHost, int serverPort)

@@ -49,6 +49,16 @@ namespace OmegaRace
             Instance().gameSceneFSM.ChangeTo(st);
         }
 
+        public List<GameObject> getObjList()
+        {
+            return gameObjList;
+        }
+
+        public static GameManager getInstance()
+        {
+            return instance;
+        }
+
         public static void Update()
         {
             Instance().pUpdate();

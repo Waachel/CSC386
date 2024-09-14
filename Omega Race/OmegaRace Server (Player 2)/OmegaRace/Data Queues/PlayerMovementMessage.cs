@@ -51,6 +51,11 @@ namespace OmegaRace.Data_Queues
             }
         }
 
-
+        public override void Reset()
+        {
+            playerNum = 0; 
+            horzInput = 0; 
+            vertInput = 0;
+        }
     }
 }

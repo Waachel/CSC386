@@ -8,23 +8,17 @@ using System.Threading.Tasks;
 namespace OmegaRace.Data_Queues
 {
     [Serializable]
-    public class PlayerMovementMessage : DataMessage
+    public class MissileMessage : DataMessage
     {
-        public int horzInput;
-        public int vertInput;
         public int playerNum;
         public override void Serialize(ref BinaryWriter writer)
         {
             writer.Write(playerNum);
-            writer.Write(horzInput);
-            writer.Write(vertInput);
         }
 
         public override void Deserialize(ref BinaryReader reader)
         {
             playerNum = reader.ReadInt32();
-            horzInput = reader.ReadInt32();
-            vertInput = reader.ReadInt32();
         }
 
         public override void Execute()
@@ -34,28 +28,20 @@ namespace OmegaRace.Data_Queues
 
             if (playerNum == 1)
             {
-                plMgr.P1Data.ship.Move(vertInput);
-                plMgr.P1Data.ship.Rotate(horzInput);
+                plMgr.P1Data.FireMissile();
             }
 
             else if (playerNum == 2)
             {
-                plMgr.P2Data.ship.Move(vertInput);
-                plMgr.P2Data.ship.Rotate(horzInput);
-
+                plMgr.P2Data.FireMissile();
             }
 
-            else
-            {
-                //do nothing
-            }
+            ActiveMissileList.missileFired = true;
         }
 
         public override void Reset()
         {
-            playerNum = 0; 
-            horzInput = 0; 
-            vertInput = 0;
+            playerNum = 0;
         }
     }
 }

@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
+using System.IO;
+using Box2DX.Common;
+using OmegaRace.Data_Queues;
+using static OmegaRace.MessageQueueManager;
+using System.Windows.Interop;
 
 namespace OmegaRace.Data_Queues
 {
+    // Message which initiate drop mine event.
     [Serializable]
-    public class MineMessage : DataMessage
+    public class MineEvent : DataMessage
     {
         public int playerNum;
         public override void Serialize(ref BinaryWriter writer)
@@ -24,20 +28,12 @@ namespace OmegaRace.Data_Queues
 
         public override void Execute()
         {
-            // Locate player manager
-            PlayerManager plMgr = GameSceneCollection.ScenePlay.PlayerMgr;
-
-            if (playerNum == 1)
-            {
-                plMgr.P1Data.LayMine();
-            }
-
-            else if (playerNum == 2)
-            {
-                plMgr.P2Data.LayMine();
-            }
-
-            ActiveMineList.mineDropped = true;
+            MineMessage mineMsg = new MineMessage();
+            mineMsg.playerNum = playerNum;
+            Message msg = new Message();
+            msg.PopulateMessage(mineMsg);
+            GameSceneCollection.ScenePlay.MessageToServer(msg);
+            GameSceneCollection.ScenePlay.MessageToClient(msg);
         }
 
         public override void Reset()

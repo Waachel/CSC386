@@ -11,7 +11,7 @@ using OmegaRace;
 
 namespace AzulNetworkBase
 {
-    class NetworkManager
+    public class NetworkManager
     {
         NetServer server;
         public NetworkManager(int serverPort)

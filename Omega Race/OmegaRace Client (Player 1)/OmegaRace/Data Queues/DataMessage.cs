@@ -22,6 +22,9 @@ namespace OmegaRace
 
         // abstract execute.
         public abstract void Execute();
+
+        // message pool reset
+        public abstract void Reset();
     }
 }
 

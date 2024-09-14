@@ -12,17 +12,14 @@ namespace OmegaRace.Data_Queues
     public class MineMessage : DataMessage
     {
         public int playerNum;
-        public bool dropMine = false;
         public override void Serialize(ref BinaryWriter writer)
         {
             writer.Write(playerNum);
-            writer.Write(dropMine);
         }
 
         public override void Deserialize(ref BinaryReader reader)
         {
             playerNum = reader.ReadInt32();
-            dropMine = reader.ReadBoolean();
         }
 
         public override void Execute()
@@ -30,22 +27,22 @@ namespace OmegaRace.Data_Queues
             // Locate player manager
             PlayerManager plMgr = GameSceneCollection.ScenePlay.PlayerMgr;
 
-            if (playerNum == 1 && dropMine)
+            if (playerNum == 1)
             {
                 plMgr.P1Data.LayMine();
             }
 
-            else if (playerNum == 2 && dropMine)
+            else if (playerNum == 2)
             {
                 plMgr.P2Data.LayMine();
             }
 
-            else
-            {
-                //do nothing
-            }
+            ActiveMineList.mineDropped = true;
         }
 
-
+        public override void Reset()
+        {
+            playerNum = 0;
+        }
     }
 }

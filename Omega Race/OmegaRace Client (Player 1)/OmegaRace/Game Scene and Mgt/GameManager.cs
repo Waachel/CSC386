@@ -41,12 +41,22 @@ namespace OmegaRace
 
         public static void SetMode()
         {
-           Instance().gameSceneFSM.ChangeTo(GameSceneCollection.SceneTitlePage);
+            Instance().gameSceneFSM.ChangeTo(GameSceneCollection.SceneTitlePage);
         }
 
         public static void ChangeState(IGameScene st)
         {
             Instance().gameSceneFSM.ChangeTo(st);
+        }
+
+        public List<GameObject> getObjList()
+        {
+            return gameObjList;
+        }
+
+        public static GameManager getInstance()
+        {
+            return instance;
         }
 
         public static void Update()
