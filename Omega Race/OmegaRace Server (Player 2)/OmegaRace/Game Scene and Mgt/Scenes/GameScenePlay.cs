@@ -12,6 +12,7 @@ using System.Windows.Interop;
 using AzulNetworkBase;
 using Box2DX.Common;
 using OmegaRace.Managers.MessageManager;
+using OmegaRace.Game_Scene_and_Mgt.Modes;
 
 namespace OmegaRace
 {
@@ -25,11 +26,18 @@ namespace OmegaRace
         public NetworkManager NetworkMgr;
 
         public MessageManager MsgMgr;
-
+        public PlaybackMode mPlayback;
+        public RecordMode mRecord;
         public GameScenePlay()
         {
             PlayerMgr = new PlayerManager();
-            MsgQueueMgr = new MessageQueueManager();
+            //MsgQueueMgr = new MessageQueueManager(new NormalMode());
+            //mRecord = new RecordMode();
+            //mRecord.SetupMode();
+            //MsgQueueMgr = new MessageQueueManager(mRecord);
+            mPlayback = new PlaybackMode();
+            mPlayback.SetupMode();
+            MsgQueueMgr = new MessageQueueManager(mPlayback);
             DisplayMgr = new DisplayManager();
             NetworkMgr = new NetworkManager(14240);
             MsgMgr = new MessageManager(10);
@@ -72,7 +80,7 @@ namespace OmegaRace
             //BinaryWriter writer = new BinaryWriter(stream);
             //m.Serialize(ref writer);
 
-            //NetworkMgr.SendMessage(stream.ToArray());
+            //NetworkMgr.SendMessage(stream.ToArray(), m.deliveryMethod, m.sequenceChannel);
         }
 
         public void MessageToClient(Message m)
@@ -85,12 +93,15 @@ namespace OmegaRace
             BinaryWriter writer = new BinaryWriter(stream);
             m.Serialize(ref writer);
 
-            NetworkMgr.SendMessage(stream.ToArray());
+            NetworkMgr.SendMessage(stream.ToArray(), m.deliveryMethod, m.sequenceChannel);
         }
         void IGameScene.Update()
-        { 
+        {
             // First, update the physics engine
-            PhysicWorld.Update();
+            if (MsgQueueMgr.mode.type != GameMode.modeType.PLAYBACK)
+            {
+                PhysicWorld.Update();
+            }
 
             //Queue processing goes here
             MsgQueueMgr.Process();
@@ -98,34 +109,63 @@ namespace OmegaRace
             //Network processing
             NetworkMgr.ProcessIncoming(this);
 
-            // Process reactions to inputs for Player 2
-            int p2_H = InputManager.GetAxis(INPUTAXIS.HORIZONTAL_P2);
-            int p2_V = InputManager.GetAxis(INPUTAXIS.VERTICAL_P2);
-            //* Direct call version
-           // PlayerMgr.P2Data.ship.Rotate(p2_H);
-            //PlayerMgr.P2Data.ship.Move(p2_V);
-            //*/
-            //Data driven example for P2 movement
-            PlayerMovementMessage msg2 = MsgMgr.GetPlayerMovementMessage();
-            msg2.playerNum = 2;
-            msg2.horzInput = p2_H;
-            msg2.vertInput = p2_V;
-            Message sendMsg = new Message();
-            sendMsg.PopulateMessage(msg2);
-            MessageToServer(sendMsg);
-
-            MsgMgr.ReleasePlayerMovementMessage(msg2);
-
-            //limit of 3 missiles
-            if (InputManager.GetButtonDown(INPUTBUTTON.P2_FIRE) && (PlayerMgr.P2Data.missileCount > 0))
+            //Playback from file
+            if (MsgQueueMgr.mode.type == GameMode.modeType.PLAYBACK)
             {
-                MissileEvent msg2F = MsgMgr.GetMissileEvent();
-                msg2F.playerNum = 2;
-                Message sendMsgF = new Message();
-                sendMsgF.PopulateMessage(msg2F);
-                MessageToServer(sendMsgF);
-                MsgMgr.ReleaseMissileEvent(msg2F);
+                mPlayback.ReadFromFile();
+
+                if (!mPlayback.playbackFinished)
+                {
+                    PhysicWorld.Update();
+                }
             }
+            else
+            {
+                // Process reactions to inputs for Player 2
+                int p2_H = InputManager.GetAxis(INPUTAXIS.HORIZONTAL_P2);
+                int p2_V = InputManager.GetAxis(INPUTAXIS.VERTICAL_P2);
+                //* Direct call version
+                // PlayerMgr.P2Data.ship.Rotate(p2_H);
+                //PlayerMgr.P2Data.ship.Move(p2_V);
+                //*/
+                //Data driven example for P2 movement
+                //only generate message if player moves
+                if (p2_H != 0 || p2_V != 0)
+                {
+                    PlayerMovementMessage msg2 = MsgMgr.GetPlayerMovementMessage();
+                    msg2.playerNum = 2;
+                    msg2.horzInput = p2_H;
+                    msg2.vertInput = p2_V;
+                    Message sendMsg = new Message();
+                    sendMsg.PopulateMessage(msg2);
+                    MessageToServer(sendMsg);
+
+                    MsgMgr.ReleasePlayerMovementMessage(msg2);
+                }
+
+
+                //limit of 3 missiles
+                if (InputManager.GetButtonDown(INPUTBUTTON.P2_FIRE) && (PlayerMgr.P2Data.missileCount > 0))
+                {
+                    MissileEvent msg2F = MsgMgr.GetMissileEvent();
+                    msg2F.playerNum = 2;
+                    Message sendMsgF = new Message();
+                    sendMsgF.PopulateMessage(msg2F);
+                    MessageToServer(sendMsgF);
+                    MsgMgr.ReleaseMissileEvent(msg2F);
+                }
+
+
+                //limit of 5 mines
+                if (InputManager.GetButtonDown(INPUTBUTTON.P2_LAYMINE) && (PlayerMgr.P2Data.mineCount > 0))
+                {
+                    MineEvent msg2M = MsgMgr.GetMineEvent();
+                    msg2M.playerNum = 2;
+                    Message sendMsgM = new Message();
+                    sendMsgM.PopulateMessage(msg2M);
+                    MessageToServer(sendMsgM);
+                    MsgMgr.ReleaseMineEvent(msg2M);
+                }
 
             //list of active missiles
             if (ActiveMissileList.missileFired)
@@ -141,17 +181,6 @@ namespace OmegaRace
 
                 // set to false.
                 ActiveMissileList.missileFired = false;
-            }
-
-            //limit of 5 mines
-            if (InputManager.GetButtonDown(INPUTBUTTON.P2_LAYMINE) && (PlayerMgr.P2Data.mineCount > 0))
-            {
-                MineEvent msg2M = MsgMgr.GetMineEvent();
-                msg2M.playerNum = 2;
-                Message sendMsgM = new Message();
-                sendMsgM.PopulateMessage(msg2M);
-                MessageToServer(sendMsgM);
-                MsgMgr.ReleaseMineEvent(msg2M);
             }
 
             //list of active mines
@@ -193,6 +222,7 @@ namespace OmegaRace
                 MsgMgr.ReleaseUpdatePlayerMovementMessage(move2);
             }
 
+
             if (ActiveMissileList.missileFired)
             {
                 // search the game object list to find new missiles
@@ -227,7 +257,7 @@ namespace OmegaRace
 
                 MsgMgr.ReleaseUpdateMissileMessage(fire1);
             }
-            
+
             //list of active mines
             if (ActiveMineList.mineDropped)
             {
@@ -282,6 +312,7 @@ namespace OmegaRace
             ScreenLog.Add(Colors.DarkKhaki, string.Format("P1 ammo: {0}", PlayerMgr.P1Data.missileCount));
             ScreenLog.Add(Colors.Orchid, string.Format("P2 ammo: {0}", PlayerMgr.P2Data.missileCount));
             //*/
+        }
         }
         void IGameScene.Draw()
         {

@@ -11,6 +11,7 @@ using System.IO;
 using static OmegaRace.MessageQueueManager;
 using System.Windows.Interop;
 using OmegaRace.Managers.MessageManager;
+using OmegaRace.Game_Scene_and_Mgt.Modes;
 
 namespace OmegaRace
 {
@@ -24,14 +25,22 @@ namespace OmegaRace
         public NetworkManager NetworkMgr;
 
         public MessageManager MsgMgr;
-
+        public PlaybackMode mPlayback;
+        public RecordMode mRecord;
         public GameScenePlay()
         {
             PlayerMgr = new PlayerManager();
-            MsgQueueMgr = new MessageQueueManager();
+            //MsgQueueMgr = new MessageQueueManager(new NormalMode());
+            //mRecord = new RecordMode();
+            //mRecord.SetupMode();
+            //MsgQueueMgr = new MessageQueueManager(mRecord);
+            mPlayback = new PlaybackMode();
+            mPlayback.SetupMode();
+            MsgQueueMgr = new MessageQueueManager(mPlayback);
             DisplayMgr = new DisplayManager();
             NetworkMgr = new NetworkManager("localhost", 14240);
             MsgMgr = new MessageManager(10);
+            
 
         }
 
@@ -71,7 +80,7 @@ namespace OmegaRace
             BinaryWriter writer = new BinaryWriter(stream);
             m.Serialize(ref writer);
 
-            NetworkMgr.SendMessage(stream.ToArray());
+            NetworkMgr.SendMessage(stream.ToArray(), m.deliveryMethod, m.sequenceChannel);
         }
 
         public void MessageToClient(Message m)
@@ -83,7 +92,7 @@ namespace OmegaRace
         void IGameScene.Update()
         { 
             // First, update the physics engine
-           // PhysicWorld.Update();
+            // PhysicWorld.Update();
 
             //Queue processing goes here
             MsgQueueMgr.Process();
@@ -91,46 +100,63 @@ namespace OmegaRace
             //Network processing
             NetworkMgr.ProcessIncoming(this);
 
-            // Process reactions to inputs for Player 1
-            int p1_H = InputManager.GetAxis(INPUTAXIS.HORIZONTAL_P1);
-            int p1_V = InputManager.GetAxis(INPUTAXIS.VERTICAL_P1);
-            //PlayerMgr.P1Data.ship.Rotate(p1_H);
-            //PlayerMgr.P1Data.ship.Move(p1_V);
-            
-
-            PlayerMovementMessage msg1 = MsgMgr.GetPlayerMovementMessage();
-            msg1.playerNum = 1;
-            msg1.horzInput = p1_H;
-            msg1.vertInput = p1_V;
-
-            Message sendMsg = new Message();
-            sendMsg.PopulateMessage(msg1);
-            MessageToServer(sendMsg);
-
-            MsgMgr.ReleasePlayerMovementMessage(msg1);
-
-            //limit of 3 missiles
-            if (InputManager.GetButtonDown(INPUTBUTTON.P1_FIRE) && (PlayerMgr.P1Data.missileCount > 0))
+            //Playback from file
+            if (MsgQueueMgr.mode.type == GameMode.modeType.PLAYBACK)
             {
-                MissileEvent msg2F = MsgMgr.GetMissileEvent();
-                msg2F.playerNum = 1;
-                Message sendMsgF = new Message();
-                sendMsgF.PopulateMessage(msg2F);
-                MessageToServer(sendMsgF);
-                MsgMgr.ReleaseMissileEvent(msg2F);
-            }
+                mPlayback.ReadFromFile();
 
-            //limit of 5 mines
-            if (InputManager.GetButtonDown(INPUTBUTTON.P1_LAYMINE) && (PlayerMgr.P1Data.mineCount > 0))
+                if (!mPlayback.playbackFinished)
+                {
+                    PhysicWorld.Update();
+                }
+            }
+            else 
             {
-                MineEvent msg1M = MsgMgr.GetMineEvent();
-                msg1M.playerNum = 1;          
-                Message sendMsgM = new Message();
-                sendMsgM.PopulateMessage(msg1M);
-                MessageToServer(sendMsgM);
-                MsgMgr.ReleaseMineEvent(msg1M);
-            }
+                // Process reactions to inputs for Player 1
+                int p1_H = InputManager.GetAxis(INPUTAXIS.HORIZONTAL_P1);
+                int p1_V = InputManager.GetAxis(INPUTAXIS.VERTICAL_P1);
+                //PlayerMgr.P1Data.ship.Rotate(p1_H);
+                //PlayerMgr.P1Data.ship.Move(p1_V);
 
+                //only generate message if player moves
+                if (p1_H != 0 || p1_V != 0)
+                {
+                    PlayerMovementMessage msg1 = MsgMgr.GetPlayerMovementMessage();
+                    msg1.playerNum = 1;
+                    msg1.horzInput = p1_H;
+                    msg1.vertInput = p1_V;
+
+                    Message sendMsg = new Message();
+                    sendMsg.PopulateMessage(msg1);
+                    MessageToServer(sendMsg);
+
+                    MsgMgr.ReleasePlayerMovementMessage(msg1);
+                }
+
+                //limit of 3 missiles
+                if (InputManager.GetButtonDown(INPUTBUTTON.P1_FIRE) && (PlayerMgr.P1Data.missileCount > 0))
+                {
+                    MissileEvent msg2F = MsgMgr.GetMissileEvent();
+                    msg2F.playerNum = 1;
+                    Message sendMsgF = new Message();
+                    sendMsgF.PopulateMessage(msg2F);
+                    MessageToServer(sendMsgF);
+                    MsgMgr.ReleaseMissileEvent(msg2F);
+                }
+
+                //limit of 5 mines
+                if (InputManager.GetButtonDown(INPUTBUTTON.P1_LAYMINE) && (PlayerMgr.P1Data.mineCount > 0))
+                {
+                    MineEvent msg1M = MsgMgr.GetMineEvent();
+                    msg1M.playerNum = 1;
+                    Message sendMsgM = new Message();
+                    sendMsgM.PopulateMessage(msg1M);
+                    MessageToServer(sendMsgM);
+                    MsgMgr.ReleaseMineEvent(msg1M);
+                }
+
+            }
+           
             //list of active missiles
             if (ActiveMissileList.missileFired)
             {

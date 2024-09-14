@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Collections;
 using static OmegaRace.MessageQueueManager;
 using System.Windows.Interop;
+using OmegaRace.Game_Scene_and_Mgt.Modes;
 
 namespace OmegaRace
 {
@@ -17,13 +18,14 @@ namespace OmegaRace
         {
             public Data_Queues.Message msg;
         }
-        protected Queue<QueueMessage> pInputQueue;
-        protected Queue<QueueMessage> pOutputQueue;
-
-        public MessageQueueManager()
+        public Queue<QueueMessage> pInputQueue;
+        public Queue<QueueMessage> pOutputQueue;
+        public GameMode mode;
+        public MessageQueueManager(GameMode gm)
         {
             pInputQueue = new Queue<QueueMessage>();
             pOutputQueue = new Queue<QueueMessage>();
+            mode = gm;
         }
 
         public void AddToInputQueue(QueueMessage msg)
@@ -38,24 +40,12 @@ namespace OmegaRace
 
         void ProcessOut()
         {
-            while (pOutputQueue.Count > 0)
-            {
-                QueueMessage msg = pOutputQueue.Dequeue();
-
-                AddToInputQueue(msg);
-            }
-
-            //ScreenLog.Add("Net msg count: " + msgcounter);
+            mode.ProcessOutputQueue(pOutputQueue);
         }
 
         void ProcessIn()
         {
-            while (pInputQueue.Count > 0)
-            {
-                QueueMessage qmsg = pInputQueue.Dequeue();
-
-                qmsg.msg.dataMsg.Execute();
-            }
+            mode.ProcessInputQueue(pInputQueue);
         }
 
         public void Process()

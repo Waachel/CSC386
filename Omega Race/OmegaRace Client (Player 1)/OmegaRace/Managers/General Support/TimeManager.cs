@@ -51,6 +51,8 @@ namespace OmegaRace
             inst.prevTime = inst.currentTime;
             inst.currentTime = now + inst.timeOffset;
             inst.frameTime = inst.currentTime - inst.prevTime;
+
+            //Debug.WriteLine("Client Time: " + GetCurrentTime());
         }
 
         public static float GetCurrentTime() { return Instance().currentTime; }

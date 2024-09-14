@@ -23,7 +23,7 @@ namespace OmegaRace
         PlayerData owner;
         PlayerManager PlMgr;
 
-        int missileCount = 3;
+        int missileCount = 0;
 
         public Ship(PlayerData own, PlayerManager pMgr, Azul.Rect screenRect, Azul.Color color)
             : base (GAMEOBJECT_TYPE.SHIP, new Azul.Rect(0, 0, 32, 32), screenRect, TextureCollection.shipTexture, color)

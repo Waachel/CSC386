@@ -71,12 +71,18 @@ namespace AzulNetworkBase
             }
         }
 
-        public void SendMessage(byte[] msgarray)
+        public void SendMessage(byte[] msgarray, NetDeliveryMethod deliveryMethod, int sequenceNum)
         {
             NetOutgoingMessage om = server.CreateMessage();
             om.Write(msgarray);
+
+            if(deliveryMethod == NetDeliveryMethod.Unknown)
+            {
+                deliveryMethod = NetDeliveryMethod.ReliableSequenced;
+            }
+
             if (server.ConnectionsCount > 0)
-                server.SendMessage(om, server.Connections[0], NetDeliveryMethod.ReliableOrdered);
+                server.SendMessage(om, server.Connections[0], deliveryMethod, sequenceNum);
         }
     }
 }

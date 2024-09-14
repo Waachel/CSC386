@@ -48,6 +48,17 @@ namespace OmegaRace.Managers.NetworkManager
                         NetConnectionStatus status = (NetConnectionStatus)im.ReadByte();
                         string reason = im.ReadString();
                         Debug.WriteLine("Connection status changed: " + status.ToString() + ": " + reason);
+                        
+                        //Sync time
+                        if (status == NetConnectionStatus.Connected)
+                        {
+                            TimeRequestMessage timeMsg = new TimeRequestMessage();
+                            timeMsg.ClientTime = TimeManager.GetCurrentTime();
+                            Message tMsg = new Message();
+                            tMsg.PopulateMessage(timeMsg);
+                            GameSceneCollection.ScenePlay.MessageToServer(tMsg);
+                        }
+                        
                         break;
 
                     // A client is sending application-related data
@@ -71,11 +82,17 @@ namespace OmegaRace.Managers.NetworkManager
             }
         }
 
-        public void SendMessage(byte[] msgarray)
+        public void SendMessage(byte[] msgarray, NetDeliveryMethod deliveryMethod, int sequenceNum)
         {
             NetOutgoingMessage om = client.CreateMessage();
             om.Write(msgarray);
-            client.SendMessage(om, client.Connections[0], NetDeliveryMethod.ReliableOrdered);
+
+            if(deliveryMethod == NetDeliveryMethod.Unknown)
+            {
+                deliveryMethod = NetDeliveryMethod.ReliableSequenced;
+            }
+
+            client.SendMessage(om, client.Connections[0], deliveryMethod, sequenceNum);
         }
     }
 }
