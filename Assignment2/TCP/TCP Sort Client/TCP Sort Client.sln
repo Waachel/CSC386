@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TCP Sort Client", "TCP Sort Client\TCP Sort Client.vcxproj", "{C59A8A7B-4D48-44DA-A3F4-FC1AF9910129}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C59A8A7B-4D48-44DA-A3F4-FC1AF9910129}.Debug|x86.ActiveCfg = Debug|Win32
+		{C59A8A7B-4D48-44DA-A3F4-FC1AF9910129}.Debug|x86.Build.0 = Debug|Win32
+		{C59A8A7B-4D48-44DA-A3F4-FC1AF9910129}.Release|x86.ActiveCfg = Release|Win32
+		{C59A8A7B-4D48-44DA-A3F4-FC1AF9910129}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BDA02E2F-269E-49D3-A4F5-6BC2CDB4AB54}
+	EndGlobalSection
+EndGlobal

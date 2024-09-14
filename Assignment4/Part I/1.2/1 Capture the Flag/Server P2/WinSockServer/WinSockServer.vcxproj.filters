@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="MemTracker">
+      <UniqueIdentifier>{1d659444-eb5b-4aa4-a943-a401d5c1c097}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Capture The Flag">
+      <UniqueIdentifier>{bddad258-4f2e-4f77-9c39-36b53f3262aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{21502525-3703-4e1d-bb3f-f93fd405239a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\MemTracker\Framework.h">
+      <Filter>MemTracker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MemTracker\ProjectSettings.h">
+      <Filter>MemTracker</Filter>
+    </ClInclude>
+    <ClInclude Include="CaptureTheFlag.h">
+      <Filter>Capture The Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="Position.h">
+      <Filter>Capture The Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="CTFPlayer.h">
+      <Filter>Capture The Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="CTFField.h">
+      <Filter>Capture The Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkManager.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WinSockServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CaptureTheFlag.cpp">
+      <Filter>Capture The Flag</Filter>
+    </ClCompile>
+    <ClCompile Include="CTFField.cpp">
+      <Filter>Capture The Flag</Filter>
+    </ClCompile>
+    <ClCompile Include="CTFPlayer.cpp">
+      <Filter>Capture The Flag</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkManager.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CTF.cd">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

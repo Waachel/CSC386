@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="SampleClass">
+    <Position X="3.75" Y="1.5" Width="2.25" />
+    <Members>
+      <Method Name="~SampleClass" Hidden="true" />
+      <Method Name="getX" Hidden="true" />
+      <Method Name="getY" Hidden="true" />
+      <Method Name="getZ" Hidden="true" />
+      <Method Name="operator=" Hidden="true" />
+      <Method Name="SampleClass" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAIAAAAAABAAAAQABgAWABAAA=</HashCode>
+      <FileName>SampleClass.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Bird">
+    <Position X="6.5" Y="1.5" Width="2.75" />
+    <Members>
+      <Method Name="~Bird" Hidden="true" />
+      <Method Name="Bird" Hidden="true" />
+      <Method Name="getS" Hidden="true" />
+      <Method Name="getX" Hidden="true" />
+      <Method Name="getY" Hidden="true" />
+      <Method Name="operator=" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAAAAAIAAAAAEAAAAAQIBgAGCAAAA=</HashCode>
+      <FileName>Bird.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fish">
+    <Position X="3.5" Y="4.25" Width="2.75" />
+    <Members>
+      <Method Name="~Fish" Hidden="true" />
+      <Method Name="Fish" Hidden="true" />
+      <Method Name="getA" Hidden="true" />
+      <Method Name="getApple" Hidden="true" />
+      <Method Name="getOrange" Hidden="true" />
+      <Method Name="getX" Hidden="true" />
+      <Method Name="getY" Hidden="true" />
+      <Method Name="operator=" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAEAAAAAAAIAAAAACAAAAgYgBoAGAAACA=</HashCode>
+      <FileName>Fish.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="pApple" />
+      <Field Name="pOrange" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="SnakeLink">
+    <Position X="5.5" Y="7.75" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>ABAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAIAAAA=</HashCode>
+      <FileName>Snake.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Snake">
+    <Position X="5" Y="10" Width="2.75" />
+    <Members>
+      <Method Name="~Snake" Hidden="true" />
+      <Method Name="getEgg" Hidden="true" />
+      <Method Name="getKey" Hidden="true" />
+      <Method Name="operator=" Hidden="true" />
+      <Method Name="Snake" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAABAAEIAAIAAAIAAAAQAAgAAAAAAA=</HashCode>
+      <FileName>Snake.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="pEgg" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Medusa">
+    <Position X="2" Y="7.75" Width="2.75" />
+    <Members>
+      <Method Name="~Medusa" Hidden="true" />
+      <Method Name="getHeadSnake" Hidden="true" />
+      <Method Name="insertSnake" Hidden="true" />
+      <Method Name="Medusa" Hidden="true" />
+      <Method Name="operator=" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAoBAAgAAAAQAAIAAAAAAAAAAAQAAgAAAAAAA=</HashCode>
+      <FileName>Snake.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="head" />
+    </ShowAsAssociation>
+  </Class>
+  <Struct Name="apple">
+    <Position X="9" Y="4.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAAAAAAAAAAQAAAAAAAACgAQAgAAAAAAA=</HashCode>
+      <FileName>Fish.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="orange">
+    <Position X="7.25" Y="5.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAkAQBgAAAAAAA=</HashCode>
+      <FileName>Fish.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Egg">
+    <Position X="8.5" Y="10" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAwAQBgAAAAAAA=</HashCode>
+      <FileName>Snake.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

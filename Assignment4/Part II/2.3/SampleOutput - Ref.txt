@@ -1,0 +1,180 @@
+
+------------ Calc Phase 1: Explicit Calls ---------------
+
+calc():    set( 3) : 3
+calc():    add( 2) : 5
+calc():    sub( 8) : -3
+calc():   mult( 2) : -6
+calc():    sub( 5) : -11
+calc():    add( 4) : -7
+calc():    add(22) : 15
+calc():    sub( 4) : 11
+calc():   mult( 2) : 22
+calc():    sub( 5) : 17
+calc():    set(11) : 11
+calc():    add( 2) : 13
+calc():    sub( 7) : 6
+calc():   mult( 3) : 18
+calc():    sub( 5) : 13
+
+------------ Calc Phase 2: Data Driven ---------------
+
+calc():    set( 3) : 3
+calc():    add( 2) : 5
+calc():    sub( 8) : -3
+calc():   mult( 2) : -6
+calc():    sub( 5) : -11
+calc():    add( 4) : -7
+calc():    add(22) : 15
+calc():    sub( 4) : 11
+calc():   mult( 2) : 22
+calc():    sub( 5) : 17
+calc():    set(11) : 11
+calc():    add( 2) : 13
+calc():    sub( 7) : 6
+calc():   mult( 3) : 18
+calc():    sub( 5) : 13
+
+------------ Calc Phase 3: Queued Data Driven ---------------
+
+calc():    set( 3) : 3
+calc():    add( 2) : 5
+calc():    sub( 8) : -3
+calc():   mult( 2) : -6
+calc():    sub( 5) : -11
+calc():    add( 4) : -7
+calc():    add(22) : 15
+calc():    sub( 4) : 11
+calc():   mult( 2) : 22
+calc():    sub( 5) : 17
+calc():    set(11) : 11
+calc():    add( 2) : 13
+calc():    sub( 7) : 6
+calc():   mult( 3) : 18
+calc():    sub( 5) : 13
+
+------------ FSM Phase 1: Explicit Calls ---------------
+
+FSM():   advance(0) : STATE_A
+FSM():   advance(1) : STATE_B
+FSM():   advance(0) : STATE_E
+FSM():   advance(1) : STATE_A
+FSM():   advance(1) : STATE_B
+FSM():   advance(0) : STATE_E
+FSM():   advance(0) : STATE_C
+FSM():   advance(1) : STATE_E
+FSM():   advance(1) : STATE_A
+FSM():   advance(1) : STATE_B
+FSM():   advance(1) : STATE_C
+FSM():   advance(0) : STATE_D
+FSM():   advance(0) : STATE_D
+FSM():   advance(1) : STATE_B
+FSM(): set(STATE_C) : STATE_C
+FSM():   advance(0) : STATE_D
+FSM():   advance(0) : STATE_D
+FSM():   advance(0) : STATE_D
+FSM(): set(STATE_C) : STATE_C
+FSM():   advance(1) : STATE_E
+FSM():   advance(0) : STATE_C
+FSM():   advance(0) : STATE_D
+FSM(): set(STATE_B) : STATE_B
+FSM():   advance(1) : STATE_C
+FSM():   advance(1) : STATE_E
+FSM():   advance(0) : STATE_C
+FSM(): set(STATE_D) : STATE_D
+FSM():   advance(1) : STATE_B
+FSM():   advance(0) : STATE_E
+FSM():   advance(1) : STATE_A
+
+------------ FSM Phase 2: Data Driven ---------------
+
+FSM():   advance(0) : STATE_A
+FSM():   advance(1) : STATE_B
+FSM():   advance(0) : STATE_E
+FSM():   advance(1) : STATE_A
+FSM():   advance(1) : STATE_B
+FSM():   advance(0) : STATE_E
+FSM():   advance(0) : STATE_C
+FSM():   advance(1) : STATE_E
+FSM():   advance(1) : STATE_A
+FSM():   advance(1) : STATE_B
+FSM():   advance(1) : STATE_C
+FSM():   advance(0) : STATE_D
+FSM():   advance(0) : STATE_D
+FSM():   advance(1) : STATE_B
+FSM(): set(STATE_C) : STATE_C
+FSM():   advance(0) : STATE_D
+FSM():   advance(0) : STATE_D
+FSM():   advance(0) : STATE_D
+FSM(): set(STATE_C) : STATE_C
+FSM():   advance(1) : STATE_E
+FSM():   advance(0) : STATE_C
+FSM():   advance(0) : STATE_D
+FSM(): set(STATE_B) : STATE_B
+FSM():   advance(1) : STATE_C
+FSM():   advance(1) : STATE_E
+FSM():   advance(0) : STATE_C
+FSM(): set(STATE_D) : STATE_D
+FSM():   advance(1) : STATE_B
+FSM():   advance(0) : STATE_E
+FSM():   advance(1) : STATE_A
+
+------------ FSM Phase 3: Queued Data Driven ---------------
+
+FSM():   advance(0) : STATE_A
+FSM():   advance(1) : STATE_B
+FSM():   advance(0) : STATE_E
+FSM():   advance(1) : STATE_A
+FSM():   advance(1) : STATE_B
+FSM():   advance(0) : STATE_E
+FSM():   advance(0) : STATE_C
+FSM():   advance(1) : STATE_E
+FSM():   advance(1) : STATE_A
+FSM():   advance(1) : STATE_B
+FSM():   advance(1) : STATE_C
+FSM():   advance(0) : STATE_D
+FSM():   advance(0) : STATE_D
+FSM():   advance(1) : STATE_B
+FSM(): set(STATE_C) : STATE_C
+FSM():   advance(0) : STATE_D
+FSM():   advance(0) : STATE_D
+FSM():   advance(0) : STATE_D
+FSM(): set(STATE_C) : STATE_C
+FSM():   advance(1) : STATE_E
+FSM():   advance(0) : STATE_C
+FSM():   advance(0) : STATE_D
+FSM(): set(STATE_B) : STATE_B
+FSM():   advance(1) : STATE_C
+FSM():   advance(1) : STATE_E
+FSM():   advance(0) : STATE_C
+FSM(): set(STATE_D) : STATE_D
+FSM():   advance(1) : STATE_B
+FSM():   advance(0) : STATE_E
+FSM():   advance(1) : STATE_A
+
+------------ Interleaved Tests(): with data driven queue ---------------
+
+calc():    set( 3) : 3
+calc():    add( 5) : 8
+calc():    sub( 9) : -1
+FSM(): set(STATE_C) : STATE_C
+FSM(): set(STATE_B) : STATE_B
+calc():   mult( 3) : -3
+FSM():   advance(1) : STATE_C
+calc():    sub( 5) : -8
+FSM():   advance(0) : STATE_D
+FSM():   advance(0) : STATE_D
+FSM(): set(STATE_B) : STATE_B
+calc():   mult( 3) : -24
+FSM():   advance(1) : STATE_C
+FSM():   advance(0) : STATE_D
+calc():    add( 2) : -22
+calc():    sub( 7) : -29
+FSM():   advance(1) : STATE_B
+FSM():   advance(0) : STATE_E
+FSM():   advance(0) : STATE_C
+calc():    add(10) : -19
+FSM():   advance(0) : STATE_D
+
+------------  program done -------------
+
