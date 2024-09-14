@@ -30,13 +30,13 @@ namespace OmegaRace
         public GameScenePlay()
         {
             PlayerMgr = new PlayerManager();
-            //MsgQueueMgr = new MessageQueueManager(new NormalMode());
+            MsgQueueMgr = new MessageQueueManager(new NormalMode());
             //mRecord = new RecordMode();
             //mRecord.SetupMode();
             //MsgQueueMgr = new MessageQueueManager(mRecord);
-            mPlayback = new PlaybackMode();
-            mPlayback.SetupMode();
-            MsgQueueMgr = new MessageQueueManager(mPlayback);
+            //mPlayback = new PlaybackMode();
+            //mPlayback.SetupMode();
+            //MsgQueueMgr = new MessageQueueManager(mPlayback);
             DisplayMgr = new DisplayManager();
             NetworkMgr = new NetworkManager("localhost", 14240);
             MsgMgr = new MessageManager(10);
